@@ -54,10 +54,16 @@ export class GameDeck {
         console.log(`discardPile [${this.discardPile}]`)
     }
 
-    play(i: number) {
+    get(i: number): Card {
         if (i >= this.hand.length) {
-            console.log('invalid index', i)
-            return
+            throw new Error(`invalid index ${i}` )
+        }
+        return this.hand[i]
+    }
+
+    moveToDiscardPile(i: number) {
+        if (i >= this.hand.length) {
+            throw new Error(`invalid index ${i}` )
         }
         let c = this.hand[i]
         this.hand.splice(i, 1);

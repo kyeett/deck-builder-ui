@@ -15,7 +15,7 @@ class App extends Component<{}, AppState> {
     }
 
     handleUpdate(s: number) {
-        this.state.gameDeck.play(s)
+        this.state.gameDeck.moveToDiscardPile(s)
 
         // TODO: Do this update in a nice way
         this.forceUpdate()

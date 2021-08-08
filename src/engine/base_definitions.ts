@@ -17,3 +17,14 @@ export const cardDefinitionsV1: CardDefinitionList = {
         ]
     }
 }
+
+export const testCardDefinitions: CardDefinitionList = {
+    'strike': {
+        cost: 1,
+        effects: [{kind: 'damage', amount: 100}]
+    },
+    'armor': {
+        cost: 1,
+        effects: [{kind: 'defense', amount: 50}]
+    },
+}
