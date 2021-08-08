@@ -1,26 +1,43 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, {Component} from 'react';
 import './App.css';
+import {GameDeck} from "./engine/deck";
+import {NewDefaultDeck} from "./engine/library";
+import MatchBoard from "./match/MatchBoard";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+type AppState = {
+    gameDeck: GameDeck
+}
+
+class App extends Component<{}, AppState> {
+    constructor(props: {}) {
+        super(props);
+        this.handleUpdate = this.handleUpdate.bind(this);
+    }
+
+    handleUpdate(s: number) {
+        this.state.gameDeck.play(s)
+
+        // TODO: Do this update in a nice way
+        this.forceUpdate()
+    }
+
+    componentWillMount() {
+        let deck = NewDefaultDeck()
+        let gameDeck = new GameDeck(deck.copy())
+        gameDeck.draw(3)
+
+        this.setState({
+            gameDeck: gameDeck
+        });
+    }
+
+    render() {
+        return (
+            <div className="App">
+                <MatchBoard deck={this.state.gameDeck} onUpdate={this.handleUpdate}/>
+            </div>
+        );
+    }
 }
 
 export default App;

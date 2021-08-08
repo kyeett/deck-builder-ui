@@ -1,0 +1,24 @@
+// Override default variables before the import
+// $body-bg: #000;
+
+// @import "../node_modules/bootstrap/scss/variables";
+
+$enable-shadows: true;
+@import "../node_modules/bootstrap/scss/functions";
+@import "../node_modules/bootstrap/scss/variables";
+
+
+// Create your own map
+// https://getbootstrap.com/docs/5.0/customize/color/#all-colors
+$custom-colors: (
+  "backside": $orange-600,
+  "attack": $red-300,
+  "defense": $green-300,
+  "black": $black,
+);
+
+// Merge the maps
+$theme-colors: $custom-colors;//map-merge($theme-colors, $custom-colors);
+
+// Import Bootstrap and its default variables
+@import '~bootstrap/scss/bootstrap.scss';
