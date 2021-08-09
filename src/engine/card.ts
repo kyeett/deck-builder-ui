@@ -34,30 +34,6 @@ export class Card {
     }
 }
 
-// Deal 7 damage. Increase defense by 4.
-
-// let c: Card = new CardConstructor()
-//     .cost(1)
-//     .effectDamage(7)
-//     .effectDefense(3)
-//     .build()
-
-
-//
-//
-//
-// let creator = new CardConstructor()
-// deck.add(creator.new('strike'))
-//
-//
-// let a = new Attack()
-// deck.add(new Attack())
-// deck.add(new Attack())
-// deck.add(new Attack())
-// deck.add(new Attack())
-//
-
-// Card
 /*
 Types? Attack, Defense
 

@@ -10,30 +10,36 @@ type InfoBoxProps = {
         label: string,
         text: string | number
     }[]
+    rowPadding?: string,
 }
-const InfoBox: FunctionComponent<InfoBoxProps> = ({title, items}) => <div>
-    <h2>{title}</h2>
-    <div className="container">
-        {
-            items.map((item, index) =>
-                <InfoRow key={index} label={item.label} text={item.text}/>)
-        }
-    </div>
-</div>;
+const InfoBox: FunctionComponent<InfoBoxProps> = ({title, items, rowPadding = '1'}) =>
+    <div className="text-start">
+        <h2>{title}</h2>
+        <div>
+            {
+                items.map((item, index) =>
+                    <InfoRow key={index} label={item.label} text={item.text} padding={rowPadding}/>)
+            }
+        </div>
+    </div>;
 
 type InfoRowProps = {
     label: string
     text: string | number
+    padding?: string
 }
 
-const InfoRow = ({label, text}: InfoRowProps) => <div className="row">
-    <div className="col-8">
-        {label}
-    </div>
-    <div className="col-4">
-        <span className="badge bg-primary rounded-pill">{text}</span>
-    </div>
-</div>
+const InfoRow = ({label, text, padding}: InfoRowProps) => {
+    const cls = "row " + (padding ? "p-" + padding : "");
+    return (<div className={cls}>
+        <div className="col-8">
+            {label}
+        </div>
+        <div className="col-4">
+            <span className="badge bg-primary rounded-pill">{text}</span>
+        </div>
+    </div>)
+}
 
 type BoardProps = {
     match: Match,
@@ -41,8 +47,6 @@ type BoardProps = {
 }
 
 export const MatchBoard: FunctionComponent<BoardProps> = ({match, onEvent}) => <div>
-
-
     <main role="main" className="container">
         <div className="row">
             <div className="col-2">
@@ -57,9 +61,21 @@ export const MatchBoard: FunctionComponent<BoardProps> = ({match, onEvent}) => <
             </div>
 
             <div className="col">
-                <h1>FIGHT</h1>
+                {match.state === 'player_won' &&
+                    <h1>YOU WON!</h1>
+                }
+                {match.state === 'player_lost' &&
+                    <h1>YOU LOST!</h1>
+                }
+                {match.state === 'player_lost' &&
+                    <h1>Fight</h1>
+                }
+
             </div>
             <div className="col-2">
+                <InfoBox title="Match" items={[
+                    {label: 'State:', text: match.state},
+                ]}/>
                 <InfoBox title="Enemy" items={[
                     {label: 'HP:', text: match.enemy},
                 ]}/>
@@ -67,14 +83,16 @@ export const MatchBoard: FunctionComponent<BoardProps> = ({match, onEvent}) => <
         </div>
     </main>
 
-    <footer className="footer">
-        <div className="container">
-            <button type="button" className="btn btn-dark border border-black rounded shadow"
-                    onClick={() => onEvent({kind: 'EndOfTurn'})}>End Turn
-            </button>
-        </div>
-        <Hand hand={match.deck.hand} onChosen={(i: number) => onEvent({kind: 'PlayCard', index: i})}/>
-    </footer>
+    {match.state === 'player_turn' &&
+        <footer className="footer">
+            <div className="container">
+                <button type="button" className="btn btn-dark border border-black rounded shadow"
+                        onClick={() => onEvent({kind: 'EndOfTurn'})}>End Turn
+                </button>
+            </div>
+            <Hand hand={match.deck.hand} onChosen={(i: number) => onEvent({kind: 'PlayCard', index: i})}/>
+        </footer>
+    }
 </div>
 
 export default MatchBoard;

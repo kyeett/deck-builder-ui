@@ -31,15 +31,13 @@ export class Player {
     }
 
     changeDefense(amount: number) {
-        this.currentDefense = Math.max(this.currentDefense - amount, 0)
+        this.currentDefense = Math.max(this.currentDefense + amount, 0)
     }
 
     changeHP(amount: number) {
-        this.currentHP = Math.max(this.currentHP - amount, 0)
+        this.currentHP = Math.max(this.currentHP + amount, 0)
     }
 }
-
-type matchState = 'started' | 'player_turn' | 'enemy_turn' | 'player_won' | 'player_lost'
 
 export class Match {
     turn = 1
@@ -52,11 +50,10 @@ export class Match {
         this.deck = deck
         this.player = player
         this.enemy = enemy
-        this.BeginTurnPlayer()
     }
 
     BeginTurnPlayer() {
-        this.state = 'player_turn'
+        this.changeState('player_turn')
 
         // Setup player
         this.player.resetEnergy()
@@ -65,19 +62,25 @@ export class Match {
         this.deck.draw(this.player.drawPerTurn)
     }
 
-    BeginEnemyTurn() {
-        this.state = 'enemy_turn'
+    RunEnemyTurn() {
+        this.changeState('enemy_turn')
+
+        // Hard coded enemy turn
+        this.player.changeHP(-7)
+
+        return this.CheckEndCondition()
     }
 
     CheckEndCondition() {
+        console.log(this.player.isDead(), this.player.currentHP)
         if (this.player.isDead()) {
-            this.state = 'player_lost'
+            this.changeState('player_lost')
             return true
         }
 
         // Fake enemy :-)
         if (this.enemy <= 0) {
-            this.state = 'player_won'
+            this.changeState('player_won')
             return true
         }
 
@@ -125,11 +128,27 @@ export class Match {
 
         if (s.kind === 'EndOfTurn') {
             this.deck.discardHand()
-            this.BeginEnemyTurn()
+            if (this.RunEnemyTurn()) {
+                return
+            }
             this.BeginTurnPlayer()
         } else if (s.kind === 'PlayCard') {
             this.PlayCard(s.index)
         }
     }
+
+    changeState(s: matchState) {
+        console.log(`state transition ${this.state} -> ${s}`)
+        if (this.state === 'started' && s !== 'started') {
+            this.state = s
+        } else if (this.state === 'player_turn' && (s === 'enemy_turn' || s === 'player_won' || s === 'player_lost')){
+            this.state = s
+        } else if (this.state === 'enemy_turn' && (s === 'player_turn' || s === 'player_won' || s === 'player_lost')) {
+            this.state = s
+        } else {
+            throw new Error(`unexpected state transition ${this.state} -> ${s}`)
+        }
+    }
 }
 
+type matchState = 'started' | 'player_turn' | 'enemy_turn' | 'player_won' | 'player_lost'

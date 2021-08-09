@@ -35,7 +35,6 @@ export class GameDeck {
                 this.drawPile = this.discardPile
                 this.discardPile = []
                 this.shuffle()
-                return
             }
 
             // Move card from draw pile to hand

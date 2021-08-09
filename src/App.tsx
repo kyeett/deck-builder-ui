@@ -13,7 +13,11 @@ class App extends Component<{}, AppState> {
     constructor(props: {}) {
         super(props);
         this.handleEvent = this.handleEvent.bind(this);
-        let match = NewMatch()
+        const match = NewMatch()
+        console.log("new match")
+        console.log(match.state)
+        match.BeginTurnPlayer()
+        console.log(match.state)
         this.state = {
             match: match,
         };
