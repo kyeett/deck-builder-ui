@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
     "target": "es6",
     "lib": [
       "dom",
@@ -18,9 +19,17 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "paths": {
+      "@project/app/modules/*": [
+        "src/engine/*"
+      ]
+    }
   },
   "include": [
-    "src"
+    "./src",
+    "./src/engine"
   ]
 }
+
+

@@ -91,7 +91,7 @@ export class Match {
 
             switch (effect.kind) {
                 case 'damage':
-                    this.player.changeHP(effect.amount)
+                    this.enemy -= effect.amount
                     break
                 case 'defense':
                     this.player.changeDefense(effect.amount)
