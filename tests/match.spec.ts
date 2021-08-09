@@ -12,7 +12,7 @@ const match = new Match(player, gameDeck, 2)
 
 
 describe('Match', () => {
-    it('should sum to three', () => {
+    it('player wins of enemy is dead', () => {
         match.BeginTurnPlayer()
         const i = gameDeck.hand.findIndex((c) => c.name === 'strike')
         expect(i).not.equal(-1)

@@ -1,40 +1,38 @@
 import React, {Component} from 'react';
 import './App.css';
-import {GameDeck} from "./engine/deck";
-import {NewDefaultDeck} from "./engine/library";
-import MatchBoard from "./match/MatchBoard";
+import {Match} from "./engine/match";
+import {NewMatch} from "./engine/library";
+import {Event} from "./engine/events";
+import {MatchBoard} from "./match/MatchBoard";
 
 type AppState = {
-    gameDeck: GameDeck
+    match: Match
 }
 
 class App extends Component<{}, AppState> {
     constructor(props: {}) {
         super(props);
-        this.handleUpdate = this.handleUpdate.bind(this);
+        this.handleEvent = this.handleEvent.bind(this);
+        let match = NewMatch()
+        this.state = {
+            match: match,
+        };
     }
 
-    handleUpdate(s: number) {
-        this.state.gameDeck.moveToDiscardPile(s)
+    handleEvent(s: Event) {
+        this.state.match.HandleEvent(s)
 
         // TODO: Do this update in a nice way
         this.forceUpdate()
     }
 
-    componentWillMount() {
-        let deck = NewDefaultDeck()
-        let gameDeck = new GameDeck(deck.copy())
-        gameDeck.draw(3)
-
-        this.setState({
-            gameDeck: gameDeck
-        });
+    componentDidMount() {
     }
 
     render() {
         return (
             <div className="App">
-                <MatchBoard deck={this.state.gameDeck} onUpdate={this.handleUpdate}/>
+                <MatchBoard match={this.state.match} onEvent={this.handleEvent}/>
             </div>
         );
     }

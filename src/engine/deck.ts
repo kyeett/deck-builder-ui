@@ -61,7 +61,7 @@ export class GameDeck {
         return this.hand[i]
     }
 
-    moveToDiscardPile(i: number) {
+    discard(i: number) {
         if (i >= this.hand.length) {
             throw new Error(`invalid index ${i}` )
         }
@@ -73,5 +73,11 @@ export class GameDeck {
 
     shuffle() {
         _.shuffle(this.drawPile)
+    }
+
+    discardHand() {
+        for (let i = this.hand.length-1; i >= 0; i--) {
+            this.discard(i)
+        }
     }
 }

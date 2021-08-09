@@ -1,8 +1,9 @@
 import {GameDeck} from "./deck";
 import {Effect} from "./card";
+import {Event} from "./events";
 
 export class Player {
-    private currentHP: number;
+    currentHP = 1;
     currentDefense = 0;
 
     currentEnergy = 0;
@@ -10,9 +11,11 @@ export class Player {
     // Per turn
     energyPerTurn = 3;
     drawPerTurn = 5
+    maxHP: number;
 
-    constructor(private maxHP: number) {
+    constructor(maxHP: number) {
         this.currentHP = maxHP
+        this.maxHP = maxHP
     }
 
     resetEnergy() {
@@ -39,9 +42,17 @@ export class Player {
 type matchState = 'started' | 'player_turn' | 'enemy_turn' | 'player_won' | 'player_lost'
 
 export class Match {
+    turn = 1
     state: matchState = 'started'
+    deck: GameDeck;
+    player: Player;
+    enemy: number
 
-    constructor(private player: Player, private deck: GameDeck, private enemy: number) {
+    constructor(player: Player, deck: GameDeck, enemy: number) {
+        this.deck = deck
+        this.player = player
+        this.enemy = enemy
+        this.BeginTurnPlayer()
     }
 
     BeginTurnPlayer() {
@@ -83,7 +94,7 @@ export class Match {
         // OK
         this.player.consumeEnergy(card.cost)
         this.applyEffects(card.effects)
-        this.deck.moveToDiscardPile(i)
+        this.deck.discard(i)
     }
 
     private applyEffects(effects: Effect[]) {
@@ -103,6 +114,21 @@ export class Match {
             if (this.CheckEndCondition()) {
                 return
             }
+        }
+    }
+
+    HandleEvent(s: Event) {
+        if (this.state !== 'player_turn') {
+            console.log(`ignore event ${s}`)
+            return
+        }
+
+        if (s.kind === 'EndOfTurn') {
+            this.deck.discardHand()
+            this.BeginEnemyTurn()
+            this.BeginTurnPlayer()
+        } else if (s.kind === 'PlayCard') {
+            this.PlayCard(s.index)
         }
     }
 }

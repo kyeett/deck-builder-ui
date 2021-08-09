@@ -16,9 +16,10 @@ const descriptionStyle = {
     color: 'black',
     backgroundColor: 'white',
     height: '100px',
-    width: '140px',
+    width: '80 px',
     borderRadius: '3px',
     margin: '0.5em',
+    fontSize: '12px'
 };
 
 export const CardComp: FunctionComponent<CardProps> = ({card, onClick}) => {

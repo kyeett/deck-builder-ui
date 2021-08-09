@@ -1,6 +1,7 @@
-import {Deck} from "./deck";
+import {Deck, GameDeck} from "./deck";
 import {cardDefinitionsV1, testCardDefinitions} from "./base_definitions";
 import {CardCreator} from "./card_creation";
+import {Match, Player} from "./match";
 
 export function NewDefaultDeck(): Deck {
     let creator = new CardCreator(cardDefinitionsV1)
@@ -22,4 +23,12 @@ export function NewTestsDeck(): Deck {
     }
 
     return deck
+}
+
+export function NewMatch(): Match{
+    let player = new Player(10)
+
+    const deck = NewDefaultDeck()
+    const gameDeck = new GameDeck(deck.copy())
+    return new Match(player, gameDeck, 2)
 }

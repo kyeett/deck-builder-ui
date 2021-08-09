@@ -4,15 +4,15 @@ import CardComp from "./CardComp";
 
 type HandProps = {
     hand: Card[]
-    onClick: (index: number) => void
+    onChosen: (index: number) => void
 }
 
-export const Hand: FunctionComponent<HandProps> = ({hand, onClick}) => <div>
+export const Hand: FunctionComponent<HandProps> = ({hand, onChosen}) => <div>
     <div>
         <div className="btn-group" role="group" aria-label="Basic example">
-            {hand.map((card, i) => {
-                return <CardComp key={i} card={card} onClick={() => onClick(i)}>Test</CardComp>
-            })}
+            {hand.map((card, i) =>
+                <CardComp key={i} card={card} onClick={() => onChosen(i)}>Test</CardComp>
+            )}
         </div>
     </div>
 </div>
