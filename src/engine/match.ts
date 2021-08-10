@@ -1,21 +1,20 @@
 import {GameDeck} from "./deck";
 import {Effect} from "./card";
 import {Event} from "./events";
+import {MatchLogic} from "./match_statemachine";
 
 export class Player {
-    currentHP = 1;
-    currentDefense = 0;
+    private currentHP = 1;
+    private currentDefense = 0;
 
-    currentEnergy = 0;
+    private currentEnergy = 0;
 
     // Per turn
-    energyPerTurn = 3;
-    drawPerTurn = 5
-    maxHP: number;
+    private energyPerTurn = 3;
+    readonly drawPerTurn = 5
 
-    constructor(maxHP: number) {
+    constructor(private maxHP: number) {
         this.currentHP = maxHP
-        this.maxHP = maxHP
     }
 
     resetEnergy() {
@@ -37,24 +36,41 @@ export class Player {
     changeHP(amount: number) {
         this.currentHP = Math.max(this.currentHP + amount, 0)
     }
+
+    status() {
+        return {
+            hp: {
+                current: this.currentHP,
+                max: this.maxHP
+            },
+            defense: this.currentDefense,
+            energy: this.currentEnergy
+        }
+    }
+
+    hasEnergy(amount:number) {
+        return this.currentEnergy >= amount;
+    }
 }
+
+export type MatchState = 'started' | 'player_turn' | 'enemy_turn' | 'player_won' | 'player_died'
 
 export class Match {
     turn = 1
-    state: matchState = 'started'
+    state: MatchState = 'started'
     deck: GameDeck;
     player: Player;
     enemy: number
+    private logic: MatchLogic;
 
     constructor(player: Player, deck: GameDeck, enemy: number) {
         this.deck = deck
         this.player = player
         this.enemy = enemy
+        this.logic = new MatchLogic(this)
     }
 
     BeginTurnPlayer() {
-        this.changeState('player_turn')
-
         // Setup player
         this.player.resetEnergy()
 
@@ -63,41 +79,38 @@ export class Match {
     }
 
     RunEnemyTurn() {
-        this.changeState('enemy_turn')
+        // this.changeState('enemy_turn')
 
         // Hard coded enemy turn
         this.player.changeHP(-7)
 
-        return this.CheckEndCondition()
+        return this.checkEndCondition()
     }
 
-    CheckEndCondition() {
-        console.log(this.player.isDead(), this.player.currentHP)
+    checkEndCondition() {
         if (this.player.isDead()) {
-            this.changeState('player_lost')
-            return true
+            return 'event_player_died'
         }
 
         // Fake enemy :-)
         if (this.enemy <= 0) {
-            this.changeState('player_won')
-            return true
+            return 'event_enemy_died'
         }
 
         return false
     }
 
-    PlayCard(i: number) {
+    playCard(i: number) {
         const card = this.deck.get(i)
-        if (card.cost > this.player.currentEnergy) {
+        if (!this.player.hasEnergy(card.cost)) {
             console.log("not enough energy")
             return
         }
 
         // OK
         this.player.consumeEnergy(card.cost)
-        this.applyEffects(card.effects)
         this.deck.discard(i)
+        return this.applyEffects(card.effects)
     }
 
     private applyEffects(effects: Effect[]) {
@@ -105,7 +118,7 @@ export class Match {
 
             switch (effect.kind) {
                 case 'damage':
-                    this.enemy -= effect.amount
+                    this.enemy = Math.max(this.enemy - effect.amount, 0)
                     break
                 case 'defense':
                     this.player.changeDefense(effect.amount)
@@ -114,41 +127,14 @@ export class Match {
                     throw new Error(`effect "${effect.kind} not supported`)
             }
 
-            if (this.CheckEndCondition()) {
-                return
+            const check = this.checkEndCondition()
+            if (check) {
+                return check
             }
         }
     }
 
     HandleEvent(s: Event) {
-        if (this.state !== 'player_turn') {
-            console.log(`ignore event ${s}`)
-            return
-        }
-
-        if (s.kind === 'EndOfTurn') {
-            this.deck.discardHand()
-            if (this.RunEnemyTurn()) {
-                return
-            }
-            this.BeginTurnPlayer()
-        } else if (s.kind === 'PlayCard') {
-            this.PlayCard(s.index)
-        }
-    }
-
-    changeState(s: matchState) {
-        console.log(`state transition ${this.state} -> ${s}`)
-        if (this.state === 'started' && s !== 'started') {
-            this.state = s
-        } else if (this.state === 'player_turn' && (s === 'enemy_turn' || s === 'player_won' || s === 'player_lost')){
-            this.state = s
-        } else if (this.state === 'enemy_turn' && (s === 'player_turn' || s === 'player_won' || s === 'player_lost')) {
-            this.state = s
-        } else {
-            throw new Error(`unexpected state transition ${this.state} -> ${s}`)
-        }
+        this.state = this.logic.handleEvent(s, this.state)
     }
 }
-
-type matchState = 'started' | 'player_turn' | 'enemy_turn' | 'player_won' | 'player_lost'

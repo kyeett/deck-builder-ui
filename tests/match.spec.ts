@@ -17,7 +17,7 @@ describe('Match', () => {
         match.BeginTurnPlayer()
         const i = gameDeck.hand.findIndex((c) => c.name === 'strike')
         expect(i).not.equal(-1)
-        match.PlayCard(i)
+        match.playCard(i)
 
         expect(match.state).equal('player_won');
     });

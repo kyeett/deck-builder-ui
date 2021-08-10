@@ -46,17 +46,21 @@ type BoardProps = {
     onEvent: (s: Event) => void
 }
 
-export const MatchBoard: FunctionComponent<BoardProps> = ({match, onEvent}) => <div>
+export const MatchBoard: FunctionComponent<BoardProps> = ({match, onEvent}) => {
+    const player = match.player.status()
+    const deck = match.deck.status()
+
+    return <div>
     <main role="main" className="container">
         <div className="row">
             <div className="col-2">
                 <InfoBox title="Player" items={[
-                    {label: 'HP', text: `${match.player.currentHP}/${match.player.maxHP}`},
-                    {label: 'Energy', text: match.player.currentEnergy}
+                    {label: 'HP', text: `${player.hp.current}/${player.hp.max}`},
+                    {label: 'Energy', text: player.energy}
                 ]}/>
                 <InfoBox title="Deck" items={[
-                    {label: 'Draw pile:', text: match.deck.drawPile.length},
-                    {label: 'Discard pile:', text: match.deck.discardPile.length}
+                    {label: 'Draw pile:', text: deck.drawPileCount},
+                    {label: 'Discard pile:', text: deck.discardPileCount}
                 ]}/>
             </div>
 
@@ -64,10 +68,10 @@ export const MatchBoard: FunctionComponent<BoardProps> = ({match, onEvent}) => <
                 {match.state === 'player_won' &&
                     <h1>YOU WON!</h1>
                 }
-                {match.state === 'player_lost' &&
+                {match.state === 'player_died' &&
                     <h1>YOU LOST!</h1>
                 }
-                {match.state === 'player_lost' &&
+                {match.state === 'player_died' &&
                     <h1>Fight</h1>
                 }
 
@@ -90,9 +94,9 @@ export const MatchBoard: FunctionComponent<BoardProps> = ({match, onEvent}) => <
                         onClick={() => onEvent({kind: 'EndOfTurn'})}>End Turn
                 </button>
             </div>
-            <Hand hand={match.deck.hand} onChosen={(i: number) => onEvent({kind: 'PlayCard', index: i})}/>
+            <Hand hand={deck.hand} onChosen={(i: number) => onEvent({kind: 'PlayCard', index: i})}/>
         </footer>
     }
-</div>
+</div>}
 
 export default MatchBoard;

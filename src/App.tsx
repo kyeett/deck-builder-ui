@@ -14,10 +14,6 @@ class App extends Component<{}, AppState> {
         super(props);
         this.handleEvent = this.handleEvent.bind(this);
         const match = NewMatch()
-        console.log("new match")
-        console.log(match.state)
-        match.BeginTurnPlayer()
-        console.log(match.state)
         this.state = {
             match: match,
         };
@@ -31,6 +27,7 @@ class App extends Component<{}, AppState> {
     }
 
     componentDidMount() {
+        this.handleEvent({kind:'MatchStarted'})
     }
 
     render() {

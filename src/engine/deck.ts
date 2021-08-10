@@ -15,12 +15,10 @@ export class Deck {
 }
 
 export class GameDeck {
-    discardPile: Card[] = []
-    hand: Card[] = []
-    drawPile: Card[] = []
+    private discardPile: Card[] = []
+    private hand: Card[] = []
 
-    constructor(drawPile: Card[]) {
-        this.drawPile = drawPile
+    constructor(private drawPile: Card[]) {
     }
 
     draw(count: number) {
@@ -55,14 +53,14 @@ export class GameDeck {
 
     get(i: number): Card {
         if (i >= this.hand.length) {
-            throw new Error(`invalid index ${i}` )
+            throw new Error(`invalid index ${i}`)
         }
         return this.hand[i]
     }
 
     discard(i: number) {
         if (i >= this.hand.length) {
-            throw new Error(`invalid index ${i}` )
+            throw new Error(`invalid index ${i}`)
         }
         let c = this.hand[i]
         this.hand.splice(i, 1);
@@ -75,8 +73,16 @@ export class GameDeck {
     }
 
     discardHand() {
-        for (let i = this.hand.length-1; i >= 0; i--) {
+        for (let i = this.hand.length - 1; i >= 0; i--) {
             this.discard(i)
+        }
+    }
+
+    status() {
+        return {
+            discardPileCount: this.discardPile.length,
+            drawPileCount: this.drawPile.length,
+            hand: this.hand,
         }
     }
 }
